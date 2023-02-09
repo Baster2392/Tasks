@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/header">
+
+    <Button
+        android:id="@+id/change_account_tasklists_button"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_weight="2"
+        android:text="Change account"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_weight="2"
+        android:text="Refresh"
+        android:id="@+id/refresh_tasklists_button"
+        style="?android:attr/buttonBarButtonStyle" />
+
+</LinearLayout>
