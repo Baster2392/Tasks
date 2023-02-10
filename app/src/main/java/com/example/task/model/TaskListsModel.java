@@ -1,8 +1,11 @@
 package com.example.task.model;
 
+import android.accounts.Account;
+
 import com.example.task.activity.MainActivity;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
@@ -20,7 +23,7 @@ public class TaskListsModel {
     private final MainActivity activity;
     private Tasks service;
 
-    public TaskListsModel(MainActivity activity, GoogleSignInAccount account) {
+    public TaskListsModel(MainActivity activity, Account account) {
         this.activity = activity;
         this.service = new Tasks(
                 new NetHttpTransport(),
@@ -29,17 +32,17 @@ public class TaskListsModel {
         );
     }
 
-    private GoogleAccountCredential getCredential(GoogleSignInAccount account) {
+    private GoogleAccountCredential getCredential(Account account) {
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                 activity.getApplicationContext(),
                 Collections.singleton(TasksScopes.TASKS)
         );
 
-        credential.setSelectedAccount(account.getAccount());
+        credential.setSelectedAccount(account);
         return credential;
     }
 
-    public void changeAccount(GoogleSignInAccount account) {
+    public void changeAccount(Account account) {
         this.service = new Tasks(
                 new NetHttpTransport(),
                 new JacksonFactory(),
@@ -47,16 +50,16 @@ public class TaskListsModel {
         );
     }
 
-     public void getTasksList() {
+     public void getTasksList() throws RuntimeException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             try {
                 TaskLists taskLists = service.tasklists().list().execute();
                 ArrayList<TaskList> taskListsArray = new ArrayList<>(taskLists.getItems());
 
-                activity.runOnUiThread(() -> activity.updateUI(taskListsArray));
+                activity.runOnUiThread(() -> activity.displayTaskLists(taskListsArray));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                activity.runOnUiThread(activity::showRuntimeAlertDialog);
             }
         });
     }

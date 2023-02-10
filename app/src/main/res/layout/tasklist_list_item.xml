@@ -2,15 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     android:padding="7dp"
     android:id="@+id/tasklist_item_view">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="placeholder"
-            android:textSize="22sp"
+            android:layout_height="50sp"
+            android:focusable="true"
+            android:text="Placeholder"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="12dp"
+            android:autoSizeMaxTextSize="18dp"
             android:id="@+id/tasktitle_text_view" />
 
 </RelativeLayout>

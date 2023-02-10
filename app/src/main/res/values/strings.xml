@@ -7,4 +7,10 @@
     <string name="hello_world">Hello Square World!</string>
     <string name="title_activity_task_lists">TaskListsActivity</string>
     <string name="cliend_api_key">687414948259-7kkuaj2rithff8pq9o2j9rk3eg7rsmsu.apps.googleusercontent.com</string>
+    <string name="task_lists">Task Lists</string>
+    <string name="account">Account</string>
+    <string name="add_tasklist">Add tasklist</string>
+    <string name="refresh">Refresh</string>
+    <string name="runtime_alert_dialog_message">Your account don\'t have permission to use this application. Use other account</string>
+    <string name="runtime_alert_dialog_title">You have no permission.</string>
 </resources>

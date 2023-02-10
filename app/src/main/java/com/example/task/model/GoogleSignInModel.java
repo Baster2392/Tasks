@@ -1,56 +1,72 @@
 package com.example.task.model;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.hotspot2.pps.Credential;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.example.task.R;
+import com.example.task.activity.MainActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GoogleSignInModel {
-    Activity activity;
-    GoogleSignInOptions signInOptions;
-    GoogleSignInClient client;
-    GoogleSignInAccount account;
+    MainActivity activity;
+    AccountManager accountManager;
+    Account account;
 
-    public GoogleSignInModel(Activity activity) {
+    public GoogleSignInModel(MainActivity activity) {
         this.activity = activity;
-        this.signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestServerAuthCode(activity.getString(R.string.cliend_api_key))
-                .requestEmail()
-                .build();
-        this.client = GoogleSignIn.getClient(activity, signInOptions);
-        this.account = GoogleSignIn.getLastSignedInAccount(activity);
+        this.accountManager = AccountManager.get(activity);
+        this.account = accountManager.getAccounts()[1];
     }
 
     public void signIn() {
-        Intent signInIntent = client.getSignInIntent();
-        activity.startActivityForResult(signInIntent, 1);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Choose account");
+        builder.setItems(getAccountNames(), (dialogInterface, i) -> {
+            setAccount(i);
+            activity.onAccountChanged();
+        }).show();
     }
 
-    public void signOut() {
-        client.signOut();
-    }
+    private String[] getAccountNames() {
+        Account[] accounts = accountManager.getAccounts();
+        String[] names = new String[accounts.length];
 
-    public void onLogResult(Intent data) {
-        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-
-        try {
-            task.getResult(ApiException.class);
-        } catch (ApiException e) {
-            Toast.makeText(activity, "Something went wrong.", Toast.LENGTH_SHORT).show();
-            return;
+        for (int i = 0; i < accounts.length; i++) {
+            names[i] = accounts[i].name;
         }
 
-        account = GoogleSignIn.getLastSignedInAccount(activity);
+        return names;
     }
 
-    public GoogleSignInAccount getAccount() {
+    private void setAccount(int i) {
+        account = accountManager.getAccounts()[i];
+    }
+
+    public Account getAccount() {
         return account;
     }
 }

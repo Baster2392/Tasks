@@ -1,24 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/header">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/change_account_tasklists_button"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_weight="2"
-        android:text="Change account"
-        style="?android:attr/buttonBarButtonStyle" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        android:text="12:00"
+        android:id="@+id/tasklisk_clock_view"/>
 
-    <Button
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_weight="2"
-        android:text="Refresh"
-        android:id="@+id/refresh_tasklists_button"
-        style="?android:attr/buttonBarButtonStyle" />
+        android:layout_height="wrap_content"
+        android:layout_margin="3sp"
+        android:paddingTop="5sp"
+        android:text="@string/task_lists"
+        android:textAlignment="center" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5sp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="2"
+            android:layout_marginHorizontal="5sp"
+            android:textSize="11sp"
+            android:textAlignment="center"
+            android:text="@string/add_tasklist"
+            android:id="@+id/add_tasklists_button"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="2"
+            android:layout_marginHorizontal="5sp"
+            android:textSize="11sp"
+            android:textAlignment="center"
+            android:text="@string/refresh"
+            android:id="@+id/refresh_tasklists_button"
+            style="?android:attr/buttonBarButtonStyle" />
+
+    </LinearLayout>
 
 </LinearLayout>
