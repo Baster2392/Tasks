@@ -1,12 +1,16 @@
 package com.example.task.activity;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -20,10 +24,17 @@ import com.example.task.databinding.ActivityMainBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TaskListsModel;
 import com.example.task.other.TaskListListAdapter;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.tasks.model.TaskList;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
@@ -31,9 +42,10 @@ public class MainActivity extends Activity {
     private GoogleSignInModel googleSignInModel;
     private TaskListsModel taskListsModel;
     private ListView taskListListView;
-    private TextView accountNameView;
+    private TextView accountNameView, clockView;
     private View taskListsHeader, taskListsFooter;
     private ProgressBar progressBar;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +57,7 @@ public class MainActivity extends Activity {
         if (googleSignInModel.getAccount() != null) {
             taskListsModel = new TaskListsModel(this, googleSignInModel.getAccount());
         } else {
-            googleSignInModel.signIn();
+            changeAccount();
         }
 
         init();
@@ -62,13 +74,13 @@ public class MainActivity extends Activity {
         taskListsHeader = ((LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.tasklist_list_header, null, false);
         taskListsFooter = ((LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.tasklist_list_footer, null, false);
 
-        TextView clockView = taskListsHeader.findViewById(R.id.tasklisk_clock_view);
+        clockView = taskListsHeader.findViewById(R.id.tasklisk_clock_view);
+        displayClock();
         Button addTaskListButton = taskListsHeader.findViewById(R.id.add_tasklists_button);
         Button refreshButton = taskListsHeader.findViewById(R.id.refresh_tasklists_button);
         accountNameView = taskListsFooter.findViewById(R.id.tasklists_account_name_view);
 
         taskListsFooter.setOnClickListener(view -> changeAccount());
-        clockView.setText(DateFormat.getTimeInstance().format(Calendar.getInstance().getTime()));
         addTaskListButton.setOnClickListener(view -> addTaskList());
         refreshButton.setOnClickListener(view -> refresh());
     }
@@ -78,11 +90,17 @@ public class MainActivity extends Activity {
     }
 
     private void changeAccount() {
+        googleSignInModel.singOut();
         googleSignInModel.signIn();
     }
 
     public void onAccountChanged() {
-        taskListsModel.changeAccount(googleSignInModel.getAccount());
+        if (taskListsModel == null) {
+            taskListsModel = new TaskListsModel(this, googleSignInModel.getAccount());
+        } else {
+            taskListsModel.changeAccount(googleSignInModel.getAccount());
+        }
+
         refresh();
     }
 
@@ -118,5 +136,28 @@ public class MainActivity extends Activity {
         builder.setTitle(R.string.runtime_alert_dialog_title);
         builder.setMessage(R.string.runtime_alert_dialog_message);
         builder.show();
+    }
+
+    private void displayClock() {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                clockView.setText(DateFormat.getTimeInstance().format(Calendar.getInstance().getTime()).substring(0, 5));
+            }
+        };
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 1000, 1000);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                googleSignInModel.onSignedResult(data);
+                taskListsModel.changeAccount(googleSignInModel.getAccount());
+                onAccountChanged();
+            }
+        }
     }
 }
