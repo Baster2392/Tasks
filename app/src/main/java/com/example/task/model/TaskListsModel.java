@@ -3,9 +3,9 @@ package com.example.task.model;
 import android.accounts.Account;
 
 import com.example.task.activity.MainActivity;
-import com.google.android.gms.auth.GoogleAuthException;
+import com.example.task.other.Consts;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
@@ -50,17 +50,14 @@ public class TaskListsModel {
         );
     }
 
-     public void getTasksList() throws RuntimeException {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            try {
-                TaskLists taskLists = service.tasklists().list().execute();
-                ArrayList<TaskList> taskListsArray = new ArrayList<>(taskLists.getItems());
+     public ArrayList<TaskList> getTasksList() throws IOException {
+         TaskLists taskLists = service.tasklists().list().execute();
+         return new ArrayList<>(taskLists.getItems());
+    }
 
-                activity.runOnUiThread(() -> activity.displayTaskLists(taskListsArray));
-            } catch (IOException e) {
-                activity.runOnUiThread(activity::showRuntimeAlertDialog);
-            }
-        });
+    public void insertTaskList(String title) throws IOException {
+        TaskList newTaskList = new TaskList();
+        newTaskList.setTitle(title);
+        service.tasklists().insert(newTaskList).execute();
     }
 }

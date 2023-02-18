@@ -1,16 +1,12 @@
 package com.example.task.activity;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Calendar;
-import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,18 +19,19 @@ import com.example.task.R;
 import com.example.task.databinding.ActivityMainBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TaskListsModel;
+import com.example.task.other.Consts;
 import com.example.task.other.TaskListListAdapter;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.tasks.model.TaskList;
+import com.google.api.services.tasks.model.TaskLists;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
@@ -63,7 +60,7 @@ public class MainActivity extends Activity {
         init();
 
         if (googleSignInModel.getAccount() != null) {
-            taskListsModel.getTasksList();
+            refresh();
         }
     }
 
@@ -76,7 +73,7 @@ public class MainActivity extends Activity {
 
         clockView = taskListsHeader.findViewById(R.id.tasklisk_clock_view);
         displayClock();
-        Button addTaskListButton = taskListsHeader.findViewById(R.id.add_tasklists_button);
+        Button addTaskListButton = taskListsHeader.findViewById(R.id.go_to_add_tasklists_activity_button);
         Button refreshButton = taskListsHeader.findViewById(R.id.refresh_tasklists_button);
         accountNameView = taskListsFooter.findViewById(R.id.tasklists_account_name_view);
 
@@ -86,7 +83,8 @@ public class MainActivity extends Activity {
     }
 
     private void addTaskList() {
-        // TODO: adding tasklist
+        Intent intent = new Intent(this, AddTaskListActivity.class);
+        startActivityForResult(intent, Consts.REQUEST_CODE_ADDED_TASKLIST);
     }
 
     private void changeAccount() {
@@ -111,15 +109,38 @@ public class MainActivity extends Activity {
         taskListListView.removeHeaderView(taskListsHeader);
         taskListListView.removeFooterView(taskListsFooter);
 
-        taskListsModel.getTasksList();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            try {
+                ArrayList<TaskList> taskListsArray = taskListsModel.getTasksList();
+                runOnUiThread(() -> getTaskListsCallback(taskListsArray));
+            } catch (UserRecoverableAuthIOException e) {
+                startActivityForResult(e.getIntent(), Consts.REQUEST_CODE_RECOVERABLE_AUTH);
+            } catch (IOException e) {
+                showRuntimeAlertDialog();
+            }
+        });
     }
 
-    private void goToAnotherActivity() {
-        Intent intent = new Intent(this, TaskListsActivity.class);
-        startActivity(intent);
+    private void addNewTaskList(String title) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            try {
+                if (title.isEmpty()) {
+                    throw new IOException();
+                }
+
+                taskListsModel.insertTaskList(title);
+                runOnUiThread(this::refresh);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    public void displayTaskLists(ArrayList<TaskList> taskLists) {
+    public void getTaskListsCallback(ArrayList<TaskList> taskLists) {
+        // TODO: what if empty list
+
         TaskListListAdapter adapter = new TaskListListAdapter(this, taskLists);
         taskListListView.addHeaderView(taskListsHeader);
         taskListListView.addFooterView(taskListsFooter);
@@ -153,10 +174,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
+            if (requestCode == Consts.REQUEST_CODE_SING_IN) {
                 googleSignInModel.onSignedResult(data);
                 taskListsModel.changeAccount(googleSignInModel.getAccount());
                 onAccountChanged();
+            } else if (requestCode == Consts.REQUEST_CODE_RECOVERABLE_AUTH) {
+                onAccountChanged();
+            } else if (requestCode == Consts.REQUEST_CODE_ADDED_TASKLIST) {
+                String title = data.getStringExtra(Consts.KEY_TASKLIST_TITLE);
+                addNewTaskList(title);
             }
         }
     }

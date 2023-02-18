@@ -35,7 +35,7 @@
             android:textSize="11sp"
             android:textAlignment="center"
             android:text="@string/add_tasklist"
-            android:id="@+id/add_tasklists_button"
+            android:id="@+id/go_to_add_tasklists_activity_button"
             style="?android:attr/buttonBarButtonStyle"/>
 
         <Button

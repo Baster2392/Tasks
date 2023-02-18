@@ -13,4 +13,9 @@
     <string name="refresh">Refresh</string>
     <string name="runtime_alert_dialog_message">Your account don\'t have permission to use this application. Use other account</string>
     <string name="runtime_alert_dialog_title">You have no permission.</string>
+    <string name="title_activity_add_task_list">AddTaskListActivity</string>
+    <string name="add_task_list">Add Task List</string>
+    <string name="title">Title</string>
+    <string name="your_title">Your title</string>
+    <string name="add">Add</string>
 </resources>

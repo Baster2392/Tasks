@@ -59,7 +59,7 @@ public class GoogleSignInModel {
     public void signIn() {
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(activity, googleSignInOptions);
         Intent intent = googleSignInClient.getSignInIntent();
-        activity.startActivityForResult(intent, 1);
+        activity.startActivityForResult(intent, Consts.REQUEST_CODE_SING_IN);
     }
 
     public void singOut() {
