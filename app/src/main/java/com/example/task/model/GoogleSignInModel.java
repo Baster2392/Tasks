@@ -41,12 +41,12 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class GoogleSignInModel {
-    MainActivity activity;
+    Activity activity;
     AccountManager accountManager;
     GoogleSignInOptions googleSignInOptions;
     Account account;
 
-    public GoogleSignInModel(MainActivity activity) {
+    public GoogleSignInModel(Activity activity) {
         this.activity = activity;
         this.accountManager = AccountManager.get(activity);
         this.googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

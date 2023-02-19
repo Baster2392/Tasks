@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.task.R;
 import com.example.task.databinding.ActivityMainBinding;
@@ -23,7 +22,6 @@ import com.example.task.other.Consts;
 import com.example.task.other.TaskListListAdapter;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.tasks.model.TaskList;
-import com.google.api.services.tasks.model.TaskLists;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -66,12 +64,12 @@ public class MainActivity extends Activity {
 
     @SuppressLint("InflateParams")
     private void init() {
-        progressBar = findViewById(R.id.tasklist_progressbar);
+        progressBar = findViewById(R.id.tasklist_list_progressbar);
         taskListListView = findViewById(R.id.tasklist_list_view);
         taskListsHeader = ((LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.tasklist_list_header, null, false);
         taskListsFooter = ((LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.tasklist_list_footer, null, false);
 
-        clockView = taskListsHeader.findViewById(R.id.tasklisk_clock_view);
+        clockView = taskListsHeader.findViewById(R.id.tasklisk_list_clock_view);
         displayClock();
         Button addTaskListButton = taskListsHeader.findViewById(R.id.go_to_add_tasklists_activity_button);
         Button refreshButton = taskListsHeader.findViewById(R.id.refresh_tasklists_button);
@@ -96,7 +94,7 @@ public class MainActivity extends Activity {
         if (taskListsModel == null) {
             taskListsModel = new TaskListsModel(this, googleSignInModel.getAccount());
         } else {
-            taskListsModel.changeAccount(googleSignInModel.getAccount());
+            taskListsModel.changeAccount(this, googleSignInModel.getAccount());
         }
 
         refresh();
@@ -146,7 +144,7 @@ public class MainActivity extends Activity {
         taskListListView.addFooterView(taskListsFooter);
 
         taskListListView.setAdapter(adapter);
-        taskListListView.setOnItemClickListener((adapterView, view, i, l) -> Toast.makeText(MainActivity.this, taskLists.get(i - 1).getTitle(), Toast.LENGTH_SHORT).show());
+        taskListListView.setOnItemClickListener((adapterView, view, i, l) -> onClickTaskList(taskLists, i));
         progressBar.setVisibility(View.INVISIBLE);
         taskListListView.setVisibility(View.VISIBLE);
         accountNameView.setText(googleSignInModel.getAccount().name);
@@ -171,12 +169,19 @@ public class MainActivity extends Activity {
         timer.scheduleAtFixedRate(timerTask, 1000, 1000);
     }
 
+    private void onClickTaskList(ArrayList<TaskList> taskLists, int i) {
+        Intent intent = new Intent(this, TaskListActivity.class);
+        intent.putExtra(Consts.KEY_TASKLIST_ID, taskLists.get(i - 1).getId());
+        intent.putExtra(Consts.KEY_TASKLIST_TITLE, taskLists.get(i - 1).getTitle());
+        startActivity(intent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == Consts.REQUEST_CODE_SING_IN) {
                 googleSignInModel.onSignedResult(data);
-                taskListsModel.changeAccount(googleSignInModel.getAccount());
+                taskListsModel.changeAccount(this, googleSignInModel.getAccount());
                 onAccountChanged();
             } else if (requestCode == Consts.REQUEST_CODE_RECOVERABLE_AUTH) {
                 onAccountChanged();

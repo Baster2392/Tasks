@@ -30,7 +30,7 @@ public class TaskListListAdapter extends ArrayAdapter<TaskList> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.tasklist_list_item, parent, false);
         }
 
-        TextView taskListTitle = convertView.findViewById(R.id.tasktitle_text_view);
+        TextView taskListTitle = convertView.findViewById(R.id.tasklist_list_item_title_view);
         taskListTitle.setText(taskList.getTitle());
 
         return convertView;

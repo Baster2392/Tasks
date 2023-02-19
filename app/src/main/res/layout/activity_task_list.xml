@@ -5,20 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context=".activity.MainActivity"
+    tools:context=".activity.TaskListActivity"
     tools:deviceIds="wear">
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tasklist_list_view" />
+        android:id="@+id/tasklist_view" />
 
     <ProgressBar
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerInParent="true"
         android:visibility="visible"
-        android:id="@+id/tasklist_list_progressbar" />
-
+        android:id="@+id/tasklist_progressbar" />
 
 </RelativeLayout>

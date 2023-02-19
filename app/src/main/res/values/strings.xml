@@ -18,4 +18,6 @@
     <string name="title">Title</string>
     <string name="your_title">Your title</string>
     <string name="add">Add</string>
+    <string name="title_activity_task_list">TaskListActivity</string>
+    <string name="add_task">Add task</string>
 </resources>

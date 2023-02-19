@@ -8,4 +8,7 @@ public class Consts {
     public static final int REQUEST_CODE_ADDED_TASKLIST = 3;
 
     public static final String KEY_TASKLIST_TITLE = "tasklisttitle";
+    public static final String KEY_TASKLIST_MODEL = "tasklistmodel";
+    public static final String KEY_TASKLIST_ID = "tasklistid";
+    public static final String KEY_TASKLIST_NAME = "tasklistname";
 }

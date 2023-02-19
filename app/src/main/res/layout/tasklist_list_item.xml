@@ -13,6 +13,6 @@
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="12dp"
             android:autoSizeMaxTextSize="18dp"
-            android:id="@+id/tasktitle_text_view" />
+            android:id="@+id/tasklist_list_item_title_view" />
 
 </RelativeLayout>
