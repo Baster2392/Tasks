@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class TaskListsModel {
-    private transient Tasks service;
+    private Tasks service;
 
     public TaskListsModel(Context context, Account account) {
         this.service = new Tasks(
@@ -45,7 +45,11 @@ public class TaskListsModel {
         );
     }
 
-     public ArrayList<TaskList> getTasksList() throws IOException {
+    public TaskList getTaskList(String id) throws IOException {
+        return service.tasklists().get(id).execute();
+    }
+
+     public ArrayList<TaskList> getTasksListAsArray() throws IOException {
          TaskLists taskLists = service.tasklists().list().execute();
          return new ArrayList<>(taskLists.getItems());
     }

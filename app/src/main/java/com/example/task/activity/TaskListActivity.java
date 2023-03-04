@@ -16,10 +16,9 @@ import android.widget.Toast;
 import com.example.task.R;
 import com.example.task.databinding.ActivityTaskListBinding;
 import com.example.task.model.GoogleSignInModel;
-import com.example.task.model.TaskListsModel;
+import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
 import com.example.task.other.TaskListAdapter;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.tasks.model.Task;
 
 import java.io.IOException;
@@ -34,14 +33,15 @@ public class TaskListActivity extends Activity {
 
     private ActivityTaskListBinding binding;
     private GoogleSignInModel googleSignInModel;
-    private TaskListsModel taskListsModel;
+    private TasksModel tasksModel;
     private ListView taskListView;
-    private TextView clockView;
+    private TaskListAdapter adapter;
+    private TextView clockView, taskListTitleView;
     private View taskListHeader;
     private ProgressBar progressBar;
     private Timer timer;
     private String taskListID, taskListTitle;
-    private ArrayList<Task> tasks;
+    private ArrayList<Task> tasks, completed;
 
 
     @Override
@@ -51,16 +51,16 @@ public class TaskListActivity extends Activity {
         setContentView(binding.getRoot());
 
         googleSignInModel = new GoogleSignInModel(this);
-        init();
-
         taskListID = getIntent().getStringExtra(Consts.KEY_TASKLIST_ID);
         taskListTitle = getIntent().getStringExtra(Consts.KEY_TASKLIST_TITLE);
+
+        init();
         refresh();
     }
 
     @SuppressLint("InflateParams")
     private void init() {
-        taskListsModel = new TaskListsModel(this, googleSignInModel.getAccount());
+        tasksModel = new TasksModel(this, googleSignInModel.getAccount(), taskListID);
 
         progressBar = findViewById(R.id.tasklist_progressbar);
         taskListView = findViewById(R.id.tasklist_view);
@@ -68,12 +68,16 @@ public class TaskListActivity extends Activity {
         taskListView.addHeaderView(taskListHeader);
 
         clockView = taskListHeader.findViewById(R.id.tasklist_clock_view);
+        taskListTitleView = taskListHeader.findViewById(R.id.tasklist_list_title_view);
         displayClock();
+        taskListTitleView.setText(taskListTitle);
         Button addTaskButton = taskListHeader.findViewById(R.id.go_to_add_task_activity_button);
         Button refreshButton = taskListHeader.findViewById(R.id.refresh_tasklist_button);
 
         addTaskButton.setOnClickListener(view -> addTask());
         refreshButton.setOnClickListener(view -> refresh());
+
+        completed = new ArrayList<>();
     }
 
     private void addTask() {
@@ -89,23 +93,50 @@ public class TaskListActivity extends Activity {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                tasks = taskListsModel.getTasks(taskListID);
-                runOnUiThread(this::getTasksCallback);
-            } catch (UserRecoverableAuthIOException e) {
-                startActivityForResult(e.getIntent(), Consts.REQUEST_CODE_RECOVERABLE_AUTH);
+                tasks = tasksModel.getUncompletedTasksAsArray();
+
+                for (Task task:
+                     tasks) {
+                    System.out.println(Integer.valueOf(task.getPosition()));
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
+
+            runOnUiThread(this::getTasksCallback);
         });
+    }
+
+    private void refreshTasks() {
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                tasks = tasksModel.getUncompletedTasksAsArray();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            runOnUiThread(this::updateList);
+        });
+    }
+
+    private void updateList() {
+        tasks.removeAll(completed);
+        adapter = new TaskListAdapter(this, this, tasks);
+        taskListView.setAdapter(adapter);
     }
 
     private void getTasksCallback() {
         taskListView.addHeaderView(taskListHeader);
-        TaskListAdapter adapter = new TaskListAdapter(this, this, tasks);
+        adapter = new TaskListAdapter(this, this, tasks);
 
         taskListView.setAdapter(adapter);
         progressBar.setVisibility(View.INVISIBLE);
         taskListView.setVisibility(View.VISIBLE);
+    }
+
+    private void taskCompletedCallback(Task task) {
+        completed.remove(task);
     }
 
     private void displayClock() {
@@ -121,9 +152,20 @@ public class TaskListActivity extends Activity {
     }
 
     public void onClickTaskRadio(View view, int i) {
-        Toast.makeText(this, tasks.get(i).getTitle(), Toast.LENGTH_SHORT).show();
-        tasks.remove(i);
-        TaskListAdapter adapter = new TaskListAdapter(this, this, tasks);
-        taskListView.setAdapter(adapter);
+        Task task = tasks.get(i);
+        Toast.makeText(this, "Completed: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+        completed.add(task);
+        updateList();
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                tasksModel.setTaskDone(task);
+                taskCompletedCallback(task);
+            } catch (IOException e) {
+                completed.remove(task);
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

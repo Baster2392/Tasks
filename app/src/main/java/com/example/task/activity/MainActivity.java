@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             try {
-                ArrayList<TaskList> taskListsArray = taskListsModel.getTasksList();
+                ArrayList<TaskList> taskListsArray = taskListsModel.getTasksListAsArray();
                 runOnUiThread(() -> getTaskListsCallback(taskListsArray));
             } catch (UserRecoverableAuthIOException e) {
                 startActivityForResult(e.getIntent(), Consts.REQUEST_CODE_RECOVERABLE_AUTH);
