@@ -3,6 +3,7 @@ package com.example.task.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -66,9 +67,9 @@ public class TaskListActivity extends Activity {
         taskListView = findViewById(R.id.tasklist_view);
         taskListHeader = ((LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.tasklist_header, null, false);
         taskListView.addHeaderView(taskListHeader);
-
         clockView = taskListHeader.findViewById(R.id.tasklist_clock_view);
         taskListTitleView = taskListHeader.findViewById(R.id.tasklist_list_title_view);
+
         displayClock();
         taskListTitleView.setText(taskListTitle);
         Button addTaskButton = taskListHeader.findViewById(R.id.go_to_add_task_activity_button);
@@ -94,29 +95,11 @@ public class TaskListActivity extends Activity {
         executor.execute(() -> {
             try {
                 tasks = tasksModel.getUncompletedTasksAsArray();
-
-                for (Task task:
-                     tasks) {
-                    System.out.println(Integer.valueOf(task.getPosition()));
-                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
             runOnUiThread(this::getTasksCallback);
-        });
-    }
-
-    private void refreshTasks() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            try {
-                tasks = tasksModel.getUncompletedTasksAsArray();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            runOnUiThread(this::updateList);
         });
     }
 
@@ -167,5 +150,10 @@ public class TaskListActivity extends Activity {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public void onClickTask(View view, int i) {
+        Intent intent = new Intent(this, TaskActivity.class);
+        startActivityForResult(intent, 100);
     }
 }

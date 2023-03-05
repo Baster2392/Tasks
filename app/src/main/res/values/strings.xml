@@ -20,4 +20,5 @@
     <string name="add">Add</string>
     <string name="title_activity_task_list">TaskListActivity</string>
     <string name="add_task">Add task</string>
+    <string name="title_activity_task">TaskActivity</string>
 </resources>

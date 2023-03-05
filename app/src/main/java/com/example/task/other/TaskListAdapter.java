@@ -35,7 +35,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 
         TextView titleView = convertView.findViewById(R.id.task_list_item_title_view);
         titleView.setText(task.getTitle());
-        titleView.setOnClickListener(view -> activity.onClickTaskRadio(view, position));
+        titleView.setOnClickListener(view -> activity.onClickTask(view, position));
 
         RadioButton radioButton = convertView.findViewById(R.id.task_list_item_radio_button);
         radioButton.setOnClickListener(view -> activity.onClickTaskRadio(view, position));
