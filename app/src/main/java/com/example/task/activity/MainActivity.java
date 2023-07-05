@@ -19,7 +19,7 @@ import com.example.task.databinding.ActivityMainBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TaskListsModel;
 import com.example.task.other.Consts;
-import com.example.task.other.TaskListListAdapter;
+import com.example.task.adapter.TaskListListAdapter;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.tasks.model.TaskList;
 
@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
     }
 
     public void getTaskListsCallback(ArrayList<TaskList> taskLists) {
-        // TODO: what if empty list
+        //TODO: what if empty list
 
         TaskListListAdapter adapter = new TaskListListAdapter(this, taskLists);
         taskListListView.addHeaderView(taskListsHeader);

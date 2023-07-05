@@ -28,6 +28,11 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <activity
+            android:name=".activity.AddTaskActivity"
+            android:exported="true"
+            android:label="@string/title_activity_add_task"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="687414948259-7kkuaj2rithff8pq9o2j9rk3eg7rsmsu.apps.googleusercontent.com" />

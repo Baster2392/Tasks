@@ -21,4 +21,10 @@
     <string name="title_activity_task_list">TaskListActivity</string>
     <string name="add_task">Add task</string>
     <string name="title_activity_task">TaskActivity</string>
+    <string name="title_activity_add_task">AddTaskActivity</string>
+    <string name="your_notes">Your notes</string>
+    <string name="notes">Notes</string>
+    <string name="date">Date</string>
+    <string name="pick_date">Pick date</string>
+    <string name="adding">Adding...</string>
 </resources>

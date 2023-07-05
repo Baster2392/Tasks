@@ -1,4 +1,4 @@
-package com.example.task.other;
+package com.example.task.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,14 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.task.R;
-import com.example.task.activity.TaskListActivity;
 import com.google.api.services.tasks.model.Task;
 
 import java.util.ArrayList;
 
 public class TaskListAdapter extends ArrayAdapter<Task> {
-    private final TaskListActivity activity;
-    public TaskListAdapter(TaskListActivity activity, Context context, ArrayList<Task> tasks) {
+    private final TaskListAdaptiveActivity activity;
+    public TaskListAdapter(TaskListAdaptiveActivity activity, Context context, ArrayList<Task> tasks) {
         super(context, R.layout.task_list_item, tasks);
         this.activity = activity;
     }

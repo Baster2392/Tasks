@@ -19,7 +19,9 @@ import com.example.task.databinding.ActivityTaskListBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
-import com.example.task.other.TaskListAdapter;
+import com.example.task.adapter.TaskListAdapter;
+import com.example.task.adapter.TaskListAdaptiveActivity;
+import com.example.task.other.TaskPositionComparator;
 import com.google.api.services.tasks.model.Task;
 
 import java.io.IOException;
@@ -30,7 +32,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class TaskListActivity extends Activity {
+public class TaskListActivity extends Activity implements TaskListAdaptiveActivity {
 
     private ActivityTaskListBinding binding;
     private GoogleSignInModel googleSignInModel;
@@ -42,7 +44,8 @@ public class TaskListActivity extends Activity {
     private ProgressBar progressBar;
     private Timer timer;
     private String taskListID, taskListTitle;
-    private ArrayList<Task> tasks, completed;
+    private ArrayList<Task> tasks, completed, children;
+    private TaskPositionComparator comparator;
 
 
     @Override
@@ -61,7 +64,8 @@ public class TaskListActivity extends Activity {
 
     @SuppressLint("InflateParams")
     private void init() {
-        tasksModel = new TasksModel(this, googleSignInModel.getAccount(), taskListID);
+        tasksModel = new TasksModel(this, googleSignInModel.getAccount());
+        comparator = new TaskPositionComparator();
 
         progressBar = findViewById(R.id.tasklist_progressbar);
         taskListView = findViewById(R.id.tasklist_view);
@@ -82,7 +86,9 @@ public class TaskListActivity extends Activity {
     }
 
     private void addTask() {
-        //TODO: add task
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra(Consts.KEY_TASKLIST_ID, taskListID);
+        startActivityForResult(intent, Consts.REQUEST_CODE_TASK_ADDED);
     }
 
     private void refresh() {
@@ -94,7 +100,7 @@ public class TaskListActivity extends Activity {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                tasks = tasksModel.getUncompletedTasksAsArray();
+                tasks = tasksModel.getUncompletedTasksAsArray(taskListID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -110,6 +116,7 @@ public class TaskListActivity extends Activity {
     }
 
     private void getTasksCallback() {
+        tasks.sort(comparator);
         taskListView.addHeaderView(taskListHeader);
         adapter = new TaskListAdapter(this, this, tasks);
 
@@ -135,7 +142,10 @@ public class TaskListActivity extends Activity {
     }
 
     public void onClickTaskRadio(View view, int i) {
-        Task task = tasks.get(i);
+        setTaskCompleted(tasks.get(i));
+    }
+
+    public void setTaskCompleted(Task task) {
         Toast.makeText(this, "Completed: " + task.getTitle(), Toast.LENGTH_SHORT).show();
         completed.add(task);
         updateList();
@@ -143,7 +153,7 @@ public class TaskListActivity extends Activity {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                tasksModel.setTaskDone(task);
+                tasksModel.setTaskDone(task, taskListID);
                 taskCompletedCallback(task);
             } catch (IOException e) {
                 completed.remove(task);
@@ -152,8 +162,67 @@ public class TaskListActivity extends Activity {
         });
     }
 
+    public void setTaskDeleted(Task task) {
+        Toast.makeText(this, "Deleted: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+        tasks.remove(task);
+        updateList();
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                tasksModel.deleteTask(task, taskListID);
+            } catch (IOException e) {
+                tasks.add(task);
+                updateList();
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public void onClickTask(View view, int i) {
+        Task chosenTask = tasks.get(i);
         Intent intent = new Intent(this, TaskActivity.class);
-        startActivityForResult(intent, 100);
+
+        intent.putExtra(Consts.KEY_HAS_POTENTIALLY_CHILDREN, true);
+        intent.putExtra(Consts.KEY_TASK_ID, chosenTask.getId());
+        intent.putExtra(Consts.KEY_TASK_TITLE, chosenTask.getTitle());
+        intent.putExtra(Consts.KEY_TASKLIST_TITLE, taskListTitle);
+        intent.putExtra(Consts.KEY_TASKLIST_ID, taskListID);
+
+        if (chosenTask.getDue() != null)
+        {
+            intent.putExtra(Consts.KEY_TASK_DUE, chosenTask.getDue().toString().substring(0, 10));
+        }
+
+        if (chosenTask.getNotes() != null)
+        {
+            intent.putExtra(Consts.KEY_TASK_NOTES, chosenTask.getNotes());
+        }
+
+        startActivityForResult(intent, Consts.REQUEST_CODE_TASK_DETAILS);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Consts.REQUEST_CODE_TASK_COMPLETED) {
+            String completedId = data.getStringExtra(Consts.KEY_TASK_ID);
+            for (Task task : tasks) {
+                if (task.getId().equals(completedId)) {
+                    setTaskCompleted(task);
+                    break;
+                }
+            }
+        }
+        else if (resultCode == Consts.REQUEST_CODE_TASK_DELETED) {
+            String deletedId = data.getStringExtra(Consts.KEY_TASK_ID);
+            for (Task task : tasks) {
+                if (task.getId().equals(deletedId)) {
+                    setTaskDeleted(task);
+                    break;
+                }
+            }
+        } else if (resultCode == Consts.REQUEST_CODE_TASK_ADDED) {
+            refresh();
+        }
     }
 }

@@ -9,84 +9,109 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30sp"
         android:layout_marginTop="35dp"
-        android:textSize="15sp"
+        android:layout_marginBottom="5sp"
+        android:textSize="20sp"
         android:text="Task Name"
+        android:textColor="#FFFFFF"
         android:id="@+id/task_title_view"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_below="@id/task_title_view"
-        android:layout_marginHorizontal="25sp"
-        android:layout_marginTop="10sp"
-        android:id="@+id/task_list_name_layout">
+        android:layout_marginBottom="10sp">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_list_24"
-            tools:ignore="ContentDescription" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="2sp"
-            android:layout_marginTop="2sp"
-            android:text="List name"
-            android:textAlignment="center"
-            android:id="@+id/task_list_name_view"/>
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="25sp"
+            android:layout_marginTop="10sp"
+            android:id="@+id/task_list_name_layout">
 
-    </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_list_24"
+                tools:ignore="ContentDescription" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/task_list_name_layout"
-        android:layout_marginHorizontal="25sp"
-        android:layout_marginTop="10sp"
-        android:id="@+id/task_date_layout">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2sp"
+                android:layout_marginTop="2sp"
+                android:text="List name"
+                android:textAlignment="center"
+                android:id="@+id/task_list_name_view"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/calendar_icon_24"
-            tools:ignore="ContentDescription" />
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="2sp"
-            android:layout_marginTop="2sp"
-            android:text="dd-mm-rrrr"
-            android:textAlignment="center"
-            android:id="@+id/task_date_view"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="25sp"
+            android:layout_marginTop="10sp"
+            android:id="@+id/task_date_layout">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/task_date_layout"
-        android:layout_marginHorizontal="25sp"
-        android:layout_marginTop="10sp"
-        android:id="@+id/task_description_layout">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/calendar_icon_24"
+                tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/description_24"
-            tools:ignore="ContentDescription" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2sp"
+                android:layout_marginTop="2sp"
+                android:text="dd-mm-rrrr"
+                android:textAlignment="center"
+                android:id="@+id/task_date_view"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="2sp"
-            android:layout_marginTop="2sp"
-            android:text="Desctription"
-            android:textSize="12sp"
-            android:id="@+id/task_description_view"/>
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="25sp"
+            android:layout_marginTop="10sp"
+            android:id="@+id/task_description_layout">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/description_24"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2sp"
+                android:layout_marginTop="2sp"
+                android:text="Desctription"
+                android:textSize="12sp"
+                android:id="@+id/task_description_view"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5sp">
+
+            <Button
+                android:layout_width="80sp"
+                android:layout_height="65sp"
+                android:layout_centerHorizontal="true"
+                android:text="@string/add_task"
+                android:textSize="12sp"
+                android:background="#0000"
+                android:id="@+id/add_task_button"/>
+
+        </RelativeLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
