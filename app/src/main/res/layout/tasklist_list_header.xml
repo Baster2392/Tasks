@@ -52,4 +52,14 @@
 
     </LinearLayout>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:layout_marginVertical="5sp"
+        android:background="#0000"
+        android:text="Today"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/today_button"
+        style="?android:attr/buttonBarButtonStyle"/>
 </LinearLayout>

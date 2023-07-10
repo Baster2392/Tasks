@@ -100,7 +100,7 @@ public class TaskListActivity extends Activity implements TaskListAdaptiveActivi
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                tasks = tasksModel.getUncompletedTasksAsArray(taskListID);
+                tasks = tasksModel.getUncompletedTasks(taskListID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

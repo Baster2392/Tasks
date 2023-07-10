@@ -73,11 +73,13 @@ public class MainActivity extends Activity {
         displayClock();
         Button addTaskListButton = taskListsHeader.findViewById(R.id.go_to_add_tasklists_activity_button);
         Button refreshButton = taskListsHeader.findViewById(R.id.refresh_tasklists_button);
+        Button todaySectionButton = taskListsHeader.findViewById(R.id.today_button);
         accountNameView = taskListsFooter.findViewById(R.id.tasklists_account_name_view);
 
         taskListsFooter.setOnClickListener(view -> changeAccount());
         addTaskListButton.setOnClickListener(view -> addTaskList());
         refreshButton.setOnClickListener(view -> refresh());
+        todaySectionButton.setOnClickListener(view -> showTodaySection());
     }
 
     private void addTaskList() {
@@ -136,9 +138,12 @@ public class MainActivity extends Activity {
         });
     }
 
-    public void getTaskListsCallback(ArrayList<TaskList> taskLists) {
-        //TODO: what if empty list
+    private void showTodaySection() {
+        Intent intent = new Intent(this, TodayActivity.class);
+        startActivity(intent);
+    }
 
+    public void getTaskListsCallback(ArrayList<TaskList> taskLists) {
         TaskListListAdapter adapter = new TaskListListAdapter(this, taskLists);
         taskListListView.addHeaderView(taskListsHeader);
         taskListListView.addFooterView(taskListsFooter);

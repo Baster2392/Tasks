@@ -3,8 +3,7 @@ package com.example.task.model;
 import android.accounts.Account;
 import android.content.Context;
 
-import com.example.task.other.TaskPositionComparator;
-import com.google.android.gms.auth.api.identity.Identity;
+import com.example.task.other.TaskInfo;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -41,7 +40,7 @@ public class TasksModel {
         return credential;
     }
 
-    public ArrayList<Task> getUncompletedTasksAsArray(String taskListId) throws IOException {
+    public ArrayList<Task> getUncompletedTasks(String taskListId) throws IOException {
         com.google.api.services.tasks.model.Tasks tasks = service.tasks().list(taskListId).execute();
         ArrayList<Task> tasksArray = new ArrayList<>();
 
@@ -65,6 +64,31 @@ public class TasksModel {
         }
 
         return tasksArray;
+    }
+
+    public ArrayList<TaskInfo> getUncompletedTasksByDate(DateTime date) throws IOException {
+        ArrayList<TaskInfo> result = new ArrayList<>();
+        ArrayList<TaskList> taskLists = (ArrayList<TaskList>) service.tasklists().list().execute().getItems();
+
+        for (TaskList taskList : taskLists) {
+            ArrayList<Task> tasks = (ArrayList<Task>) service.tasks().list(taskList.getId()).execute().getItems();
+
+            for (Task task : tasks) {
+                if (task.getDue() == null) {
+                    continue;
+                }
+
+                if (!task.getStatus().equals(STATUS_COMPLETED) && isSameDay(task.getDue(), date)) {
+                    result.add(new TaskInfo(task, taskList.getId(), taskList.getTitle()));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private boolean isSameDay(DateTime date1, DateTime date2) {
+        return date1.toString().substring(0, 10).equals(date2.toString().substring(0, 10));
     }
 
     public void setTaskDone(Task task, String taskListId) throws IOException {

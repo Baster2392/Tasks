@@ -27,4 +27,6 @@
     <string name="date">Date</string>
     <string name="pick_date">Pick date</string>
     <string name="adding">Adding...</string>
+    <string name="title_activity_today">TodayActivity</string>
+    <string name="today">Today</string>
 </resources>

@@ -29,9 +29,14 @@
             android:value="true" />
 
         <activity
+            android:name=".activity.TodayActivity"
+            android:exported="true"
+            android:label="@string/title_activity_today">
+        </activity>
+        <activity
             android:name=".activity.AddTaskActivity"
             android:exported="true"
-            android:label="@string/title_activity_add_task"/>
+            android:label="@string/title_activity_add_task" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
