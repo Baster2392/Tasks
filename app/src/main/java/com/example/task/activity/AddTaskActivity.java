@@ -16,6 +16,7 @@ import com.example.task.databinding.ActivityAddTaskBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
+import com.example.task.other.NetworkConnectionErrorDialog;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.model.Task;
 
@@ -119,7 +120,7 @@ public class AddTaskActivity extends Activity {
                 setResult(Consts.REQUEST_CODE_TASK_ADDED);
                 finish();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }

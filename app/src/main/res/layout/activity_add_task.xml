@@ -26,7 +26,7 @@
             android:layout_marginTop="45sp"
             android:textSize="12sp"
             android:textAlignment="center"
-            android:text="@string/notes" />
+            android:text="@string/title" />
 
         <EditText
             android:layout_width="match_parent"
@@ -45,7 +45,7 @@
             android:layout_marginTop="130sp"
             android:textSize="12sp"
             android:textAlignment="center"
-            android:text="@string/title" />
+            android:text="@string/notes" />
 
         <EditText
             android:layout_width="match_parent"

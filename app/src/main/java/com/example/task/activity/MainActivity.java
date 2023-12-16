@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -133,7 +134,7 @@ public class MainActivity extends Activity {
                 taskListsModel.insertTaskList(title);
                 runOnUiThread(this::refresh);
             } catch (IOException e) {
-                e.printStackTrace();
+                showRuntimeAlertDialog();
             }
         });
     }
@@ -159,7 +160,8 @@ public class MainActivity extends Activity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.runtime_alert_dialog_title);
         builder.setMessage(R.string.runtime_alert_dialog_message);
-        builder.show();
+        builder.setPositiveButton("OK", (dialogInterface, i) -> finish());
+        runOnUiThread(builder::show);
     }
 
     private void displayClock() {

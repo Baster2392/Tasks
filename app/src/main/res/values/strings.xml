@@ -11,8 +11,8 @@
     <string name="account">Account</string>
     <string name="add_tasklist">Add tasklist</string>
     <string name="refresh">Refresh</string>
-    <string name="runtime_alert_dialog_message">Your account don\'t have permission to use this application. Use other account</string>
-    <string name="runtime_alert_dialog_title">You have no permission.</string>
+    <string name="runtime_alert_dialog_message">Your account don\'t have permission to use this application. Use other account or check your internet connection.</string>
+    <string name="runtime_alert_dialog_title">You have no permission or no internet connection.</string>
     <string name="title_activity_add_task_list">AddTaskListActivity</string>
     <string name="add_task_list">Add Task List</string>
     <string name="title">Title</string>

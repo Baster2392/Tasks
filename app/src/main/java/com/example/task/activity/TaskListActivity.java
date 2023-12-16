@@ -21,6 +21,7 @@ import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
 import com.example.task.adapter.TaskListAdapter;
 import com.example.task.adapter.TaskListAdaptiveActivity;
+import com.example.task.other.NetworkConnectionErrorDialog;
 import com.example.task.other.TaskPositionComparator;
 import com.google.api.services.tasks.model.Task;
 
@@ -102,7 +103,7 @@ public class TaskListActivity extends Activity implements TaskListAdaptiveActivi
             try {
                 tasks = tasksModel.getUncompletedTasks(taskListID);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
 
             runOnUiThread(this::getTasksCallback);
@@ -156,8 +157,7 @@ public class TaskListActivity extends Activity implements TaskListAdaptiveActivi
                 tasksModel.setTaskDone(task, taskListID);
                 taskCompletedCallback(task);
             } catch (IOException e) {
-                completed.remove(task);
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }
@@ -172,9 +172,7 @@ public class TaskListActivity extends Activity implements TaskListAdaptiveActivi
             try {
                 tasksModel.deleteTask(task, taskListID);
             } catch (IOException e) {
-                tasks.add(task);
-                updateList();
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }

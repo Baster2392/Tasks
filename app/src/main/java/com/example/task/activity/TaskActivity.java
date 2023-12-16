@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
 import com.example.task.adapter.TaskListAdaptiveActivity;
+import com.example.task.other.NetworkConnectionErrorDialog;
 import com.example.task.other.TaskPositionComparator;
 import com.google.api.services.tasks.model.Task;
 
@@ -90,6 +92,11 @@ public class TaskActivity extends Activity implements TaskListAdaptiveActivity {
         completedButton = taskListFooter.findViewById(R.id.task_done_button);
         deleteButton = taskListFooter.findViewById(R.id.task_delete_button);
 
+        if (!hasPotentiallyChildren) {
+            RelativeLayout addTaskButtonLayout = taskListHeader.findViewById(R.id.add_task_button_layout);
+            addTaskButtonLayout.removeAllViews();
+        }
+
         if (due == null) {
             LinearLayout dueLayout = taskListHeader.findViewById(R.id.task_date_layout);
             dueLayout.removeAllViews();
@@ -128,12 +135,13 @@ public class TaskActivity extends Activity implements TaskListAdaptiveActivity {
         childrenView.removeHeaderView(taskListHeader);
         childrenView.removeFooterView(taskListFooter);
 
+        Context context = this;
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
                 children = tasksModel.getUncompletedChildren(taskListId, id);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                runOnUiThread(() -> NetworkConnectionErrorDialog.show(context, e));
             }
 
             runOnUiThread(this::getTasksCallback);
@@ -178,8 +186,7 @@ public class TaskActivity extends Activity implements TaskListAdaptiveActivity {
                 tasksModel.setTaskDone(task, taskListId);
                 taskCompletedCallback(task);
             } catch (IOException e) {
-                completed.remove(task);
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }
@@ -198,9 +205,7 @@ public class TaskActivity extends Activity implements TaskListAdaptiveActivity {
             try {
                 tasksModel.deleteTask(task, taskListId);
             } catch (IOException e) {
-                children.add(task);
-                updateList();
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }

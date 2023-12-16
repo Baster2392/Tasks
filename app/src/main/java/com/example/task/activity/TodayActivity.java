@@ -19,6 +19,7 @@ import com.example.task.databinding.ActivityTodayBinding;
 import com.example.task.model.GoogleSignInModel;
 import com.example.task.model.TasksModel;
 import com.example.task.other.Consts;
+import com.example.task.other.NetworkConnectionErrorDialog;
 import com.example.task.other.TaskInfo;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.model.Task;
@@ -85,7 +86,7 @@ public class TodayActivity extends Activity implements TaskListAdaptiveActivity 
 
                 runOnUiThread(() -> getTaskListsCallback(taskInfos));
             } catch (IOException e) {
-                throw new RuntimeException();
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }
@@ -110,7 +111,9 @@ public class TodayActivity extends Activity implements TaskListAdaptiveActivity 
         Task chosenTask = taskInfos.get(i).getTask();
         Intent intent = new Intent(this, TaskActivity.class);
 
-        intent.putExtra(Consts.KEY_HAS_POTENTIALLY_CHILDREN, true);
+        System.out.println(chosenTask.getParent());
+
+        intent.putExtra(Consts.KEY_HAS_POTENTIALLY_CHILDREN, chosenTask.getParent() == null);
         intent.putExtra(Consts.KEY_TASK_ID, chosenTask.getId());
         intent.putExtra(Consts.KEY_TASK_TITLE, chosenTask.getTitle());
         intent.putExtra(Consts.KEY_TASKLIST_TITLE, taskInfos.get(i).getTaskListTitle());
@@ -146,8 +149,7 @@ public class TodayActivity extends Activity implements TaskListAdaptiveActivity 
                 tasksModel.setTaskDone(task, taskInfo.getTaskListId());
                 taskCompletedCallback(taskInfo);
             } catch (IOException e) {
-                completed.remove(taskInfo);
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }
@@ -212,9 +214,7 @@ public class TodayActivity extends Activity implements TaskListAdaptiveActivity 
             try {
                 tasksModel.deleteTask(taskInfo.getTask(), taskInfo.getTaskListId());
             } catch (IOException e) {
-                taskInfos.add(taskInfo);
-                updateList();
-                throw new RuntimeException(e);
+                NetworkConnectionErrorDialog.show(this, e);
             }
         });
     }
